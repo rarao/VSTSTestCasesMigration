@@ -170,7 +170,7 @@ namespace VSTSTestCasesMigration
             testCase.Save();
         }
 
-        public static void CreateAreaPath(string areaPath, string uri, Guid projectGUID)
+        public static void CreateAreaPath(string areaPath, string uri, Guid projectGUID,string PAT)
         {
             try
             {
@@ -180,7 +180,6 @@ namespace VSTSTestCasesMigration
                 string pathToParentNode = areaPath.Substring(areaPath.IndexOf('\\') + 1, areaPath.LastIndexOf('\\') - areaPath.IndexOf('\\'));
                 node.Name = areaName;
 
-                string PAT = "izuresvf3e4tkxdgvwc5rgam4y5gvgc2lihsp5b3rw7yjyk2zxpq";
                 VssConnection connection = new VssConnection(new Uri(uri), new VssBasicCredential(string.Empty, PAT));
                 var client = connection.GetClient<WorkItemTrackingHttpClient>();
 
