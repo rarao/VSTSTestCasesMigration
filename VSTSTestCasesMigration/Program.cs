@@ -74,7 +74,7 @@ namespace VSTSTestCasesMigration
                 string Priority = string.Empty;
                 string Release = string.Empty;
                 string AutomationStatus = string.Empty;
-                string AutomationClassName = string.Empty;               
+                string AutomationClassName = string.Empty;
                 string AutomationID = string.Empty;
                 string ReasonforNotAutomating = string.Empty;
                 string TestCategory = string.Empty;
@@ -97,7 +97,7 @@ namespace VSTSTestCasesMigration
                     string allsteps = precondition;
                     string allexpectedresults = string.Empty;
                     if (xlRange.Cells[i, 11] != null && xlRange.Cells[i, 11].Value2 != null)
-                    {                        
+                    {
                         do
                         {
                             allsteps += xlRange.Cells[i, 11].Value2.ToString();
@@ -188,7 +188,7 @@ namespace VSTSTestCasesMigration
                     }
                     if (xlRange.Cells[i, 28] != null && xlRange.Cells[i, 28].Value2 != null)
                     {
-                        Applicable = xlRange.Cells[i, 22].Value2.ToString();
+                        Applicable = xlRange.Cells[i, 28].Value2.ToString();
                     }
                     if (xlRange.Cells[i, 29] != null && xlRange.Cells[i, 29].Value2 != null)
                     {
@@ -227,6 +227,7 @@ namespace VSTSTestCasesMigration
                     VSTSOperations.CreateNewTestCase(uri, project, title, areaPathStack.Peek(), projectName, description, assignee, steps, extraFields, attachments);
 
                 }
+                Console.WriteLine("Processed Row : " + i.ToString() + " of " + rowCount.ToString());
             }
 
             //cleanup
