@@ -13,8 +13,13 @@ namespace VSTSTestCasesMigration
 {
     class Program
     {
+        static string ReplaceReservedChars(string str)
+        {
+            str = str.Replace("<", "").Replace(">", "").Replace(":", "").Replace("\"", "").Replace("/", "").Replace("\\", "").Replace("|", "").Replace("?", "").Replace("*", "");
+            return str;
+        }
         static void Main(string[] args)
-        {           
+        {
             string uri = ConfigurationManager.AppSettings["Uri"];
             string projectName = ConfigurationManager.AppSettings["ProjectName"];
             string productName = ConfigurationManager.AppSettings["ProductName"];
@@ -22,12 +27,19 @@ namespace VSTSTestCasesMigration
             string PAT = ConfigurationManager.AppSettings["PAT"];
             string baseDirectory = ConfigurationManager.AppSettings["BaseDirectory"];
             string tcFileName = ConfigurationManager.AppSettings["TestCasesFile"];
+            bool createAreaPaths = Convert.ToBoolean(ConfigurationManager.AppSettings["CreateAreaPaths"]);
             var project = VSTSOperations.GetTeamProject(uri, projectName);
 
-            int logFileStartIndex = baseDirectory.LastIndexOf('\\',baseDirectory.Length - 2) + 1;
-            MyLogger.FileName = AppDomain.CurrentDomain.BaseDirectory + baseDirectory.Substring(logFileStartIndex, baseDirectory.Length - logFileStartIndex - 1) + DateTime.Now.ToString("yyMMddHHmmss")+".txt";
-            MyLogger.Log("abbcddd");
+            int logFileStartIndex = baseDirectory.LastIndexOf('\\', baseDirectory.Length - 2) + 1;
+            MyLogger.FileName = AppDomain.CurrentDomain.BaseDirectory + baseDirectory.Substring(logFileStartIndex, baseDirectory.Length - logFileStartIndex - 1) + DateTime.Now.ToString("yyMMddHHmmss") + ".txt";
+            //MyLogger.Log("abbcddd");
             //VSTSOperations.ManageTestPlans(uri, project, ConfigurationManager.AppSettings["TestPlanName"]);
+            List<int> ids = new List<int>();
+            for (int i = 15560; i <= 16565; i++)
+            {
+                ids.Add(i);
+            }
+            VSTSOperations.DeleteWorkItems(uri, ids);
 
             Excel.Application xlApp = new Excel.Application();
             Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(baseDirectory + tcFileName);
@@ -40,6 +52,54 @@ namespace VSTSTestCasesMigration
             Stack<string> areaPathStack = new Stack<string>();
             areaPathStack.Push(projectName + "\\" + productName);
 
+            if (createAreaPaths)
+            {
+                for (int i = 2; i <= rowCount; i++)
+                {
+                    try
+                    {
+                        string suiteName = string.Empty;
+                        int depth = 0;
+                        if (xlRange.Cells[i, 1] != null && xlRange.Cells[i, 1].Value2 != null)
+                        {
+                            depth = Convert.ToInt32(xlRange.Cells[i, 1].Value2.ToString());
+
+                            if (depth == -1)
+                                break;
+
+                            if (xlRange.Cells[i, 2] == null || xlRange.Cells[i, 2].Value2 == null)
+                            {
+                                throw new Exception("excel is not formatted correctly.");
+                            }
+                            suiteName = xlRange.Cells[i, 2].Value2.ToString();
+                            suiteName = suiteName.Substring(suiteName.IndexOf(' ') + 1).Trim();
+
+                            suiteName = ReplaceReservedChars(suiteName);
+
+                            while (depth <= areaPathStack.Count - 1)
+                            {
+                                areaPathStack.Pop();
+                            }
+
+                            areaPathStack.Push(areaPathStack.Peek() + "\\" + suiteName);
+                            VSTSOperations.CreateAreaPath(areaPathStack.Peek(), uri, project.Guid, PAT);
+                            project = VSTSOperations.GetTeamProject(uri, projectName);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MyLogger.Log("Error while creating area path : " + areaPathStack.Peek() + " on row : " + i.ToString());
+                        MyLogger.Log(ex.Message);
+                    }
+                    Console.WriteLine("Area Path Processed Row : " + i.ToString() + " of " + rowCount.ToString());
+                }
+            }
+
+            while (areaPathStack.Count != 0)
+                areaPathStack.Pop();
+
+            areaPathStack.Push(projectName + "\\" + productName);
+
             for (int i = 2; i <= rowCount; i++)
             {
                 try
@@ -48,6 +108,11 @@ namespace VSTSTestCasesMigration
                     int depth = 0;
                     if (xlRange.Cells[i, 1] != null && xlRange.Cells[i, 1].Value2 != null)
                     {
+                        depth = Convert.ToInt32(xlRange.Cells[i, 1].Value2.ToString());
+
+                        if (depth == -1)
+                            break;
+
                         if (xlRange.Cells[i, 2] == null || xlRange.Cells[i, 2].Value2 == null)
                         {
                             throw new Exception("excel is not formatted correctly.");
@@ -55,10 +120,7 @@ namespace VSTSTestCasesMigration
                         suiteName = xlRange.Cells[i, 2].Value2.ToString();
                         suiteName = suiteName.Substring(suiteName.IndexOf(' ') + 1).Trim();
 
-                        depth = Convert.ToInt32(xlRange.Cells[i, 1].Value2.ToString());
-
-                        if (depth == -1)
-                            break;
+                        suiteName = ReplaceReservedChars(suiteName);
 
                         while (depth <= areaPathStack.Count - 1)
                         {
@@ -66,6 +128,8 @@ namespace VSTSTestCasesMigration
                         }
 
                         areaPathStack.Push(areaPathStack.Peek() + "\\" + suiteName);
+                        //VSTSOperations.CreateAreaPath(areaPathStack.Peek(), uri, project.Guid, PAT);
+                        //project = VSTSOperations.GetTeamProject(uri, projectName);
                     }
 
                     Tuple<string, string>[] steps = new Tuple<string, string>[1];
@@ -101,6 +165,8 @@ namespace VSTSTestCasesMigration
                         }
                         string allsteps = precondition;
                         string allexpectedresults = string.Empty;
+                        int iBeforeSteps = i;
+                        int iAfterSteps = i;
                         if (xlRange.Cells[i, 11] != null && xlRange.Cells[i, 11].Value2 != null)
                         {
                             do
@@ -109,7 +175,8 @@ namespace VSTSTestCasesMigration
                                 allexpectedresults += xlRange.Cells[i, 12].Value2.ToString();
                                 i++;
                             } while ((xlRange.Cells[i, 3] == null || xlRange.Cells[i, 3].Value2 == null) && (xlRange.Cells[i, 11] != null && xlRange.Cells[i, 11].Value2 != null));
-                            i--;
+                            iAfterSteps = i - 1;
+                            i = iBeforeSteps;
                         }
 
                         steps[0] = new Tuple<string, string>(allsteps, allexpectedresults);
@@ -226,19 +293,19 @@ namespace VSTSTestCasesMigration
                                 i++;
                             } while ((xlRange.Cells[i, 3] == null || xlRange.Cells[i, 3].Value2 == null) && (xlRange.Cells[i, 5] != null && xlRange.Cells[i, 5].Value2 != null));
                             i--;
+                            i = (i > iAfterSteps) ? i : iAfterSteps;
                         }
 
-                        VSTSOperations.CreateAreaPath(areaPathStack.Peek(), uri, project.Guid, PAT);
                         VSTSOperations.CreateNewTestCase(uri, project, title, areaPathStack.Peek(), projectName, description, assignee, steps, extraFields, attachments);
 
                     }
                     Console.WriteLine("Processed Row : " + i.ToString() + " of " + rowCount.ToString());
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MyLogger.Log("Error while processing row : " + i.ToString());
                     MyLogger.Log(ex.Message);
-                } 
+                }
             }
 
             //cleanup

@@ -67,14 +67,32 @@ namespace VSTSTestCasesMigration
             tfs.Authenticate();
 
             var workItemStore = new WorkItemStore(tfs);
-
+            
             var project = (from Project pr in workItemStore.Projects
                            where pr.Name == name
                            select pr).FirstOrDefault();
             if (project == null)
                 throw new Exception($"Unable to find {name} in {uri}");
-
+            
             return project;
+        }
+        public static void DeleteWorkItems(string uri,List<int> ids)
+        {
+            try
+            {
+                TfsTeamProjectCollection tfs;
+
+                tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(new Uri(uri)); // https://mytfs.visualstudio.com/DefaultCollection
+                tfs.Authenticate();
+
+                var workItemStore = new WorkItemStore(tfs);
+
+                workItemStore.DestroyWorkItems(ids);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error while deleting workitems " + ex.Message);
+            }
         }
         public static void ManageTestPlans(string uri, Project project, string testPlanName)
         {
@@ -186,11 +204,11 @@ namespace VSTSTestCasesMigration
                 var result = client.CreateOrUpdateClassificationNodeAsync(node, projectGUID, Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.TreeStructureGroup.Areas, pathToParentNode).Result;
             }
             catch (AggregateException ex)
-            {
-
+            {               
             }
             catch (Exception ex)
             {
+                MyLogger.Log("Error in AreaPath Creation : " + areaPath);
                 throw;
             }
         }
@@ -200,8 +218,8 @@ namespace VSTSTestCasesMigration
 
             // Create the work item. 
             WorkItem newTestCase = new WorkItem(workItemType);
-            newTestCase.Title = title;
-            newTestCase.Description = description;
+            newTestCase.Title = string.IsNullOrEmpty(title)?"Untitled":title;
+            newTestCase.Description = string.IsNullOrEmpty(description) ? "no desc" : description;
             newTestCase.AreaPath = areaPath;
             newTestCase.IterationPath = iterationPath;
             newTestCase.Fields["Assigned To"].Value = assignee;
