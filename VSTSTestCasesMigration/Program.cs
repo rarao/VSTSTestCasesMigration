@@ -13,11 +13,6 @@ namespace VSTSTestCasesMigration
 {
     class Program
     {
-        static string ReplaceReservedChars(string str)
-        {
-            str = str.Replace("<", "").Replace(">", "").Replace(":", "").Replace("\"", "").Replace("/", "").Replace("\\", "").Replace("|", "").Replace("?", "").Replace("*", "");
-            return str;
-        }
         static void Main(string[] args)
         {
             string uri = ConfigurationManager.AppSettings["Uri"];
@@ -34,12 +29,12 @@ namespace VSTSTestCasesMigration
             MyLogger.FileName = AppDomain.CurrentDomain.BaseDirectory + baseDirectory.Substring(logFileStartIndex, baseDirectory.Length - logFileStartIndex - 1) + DateTime.Now.ToString("yyMMddHHmmss") + ".txt";
             //MyLogger.Log("abbcddd");
             //VSTSOperations.ManageTestPlans(uri, project, ConfigurationManager.AppSettings["TestPlanName"]);
-            List<int> ids = new List<int>();
-            for (int i = 15560; i <= 16565; i++)
-            {
-                ids.Add(i);
-            }
-            VSTSOperations.DeleteWorkItems(uri, ids);
+            //List<int> ids = new List<int>();
+            //for (int i = 18253; i <= 19352; i++)
+            //{
+            //    ids.Add(i);
+            //}
+            //VSTSOperations.DeleteWorkItems(uri, ids);
 
             Excel.Application xlApp = new Excel.Application();
             Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(baseDirectory + tcFileName);
@@ -74,7 +69,7 @@ namespace VSTSTestCasesMigration
                             suiteName = xlRange.Cells[i, 2].Value2.ToString();
                             suiteName = suiteName.Substring(suiteName.IndexOf(' ') + 1).Trim();
 
-                            suiteName = ReplaceReservedChars(suiteName);
+                            suiteName = Helpers.ReplaceReservedChars(suiteName);
 
                             while (depth <= areaPathStack.Count - 1)
                             {
@@ -120,7 +115,7 @@ namespace VSTSTestCasesMigration
                         suiteName = xlRange.Cells[i, 2].Value2.ToString();
                         suiteName = suiteName.Substring(suiteName.IndexOf(' ') + 1).Trim();
 
-                        suiteName = ReplaceReservedChars(suiteName);
+                        suiteName = Helpers.ReplaceReservedChars(suiteName);
 
                         while (depth <= areaPathStack.Count - 1)
                         {
@@ -196,10 +191,13 @@ namespace VSTSTestCasesMigration
                         if (xlRange.Cells[i, 4] != null && xlRange.Cells[i, 4].Value2 != null)
                         {
                             title = xlRange.Cells[i, 4].Value2.ToString();
+                            title = Helpers.ReplaceReservedChars(title);
+                            title = (title.Length > 255) ? title.Substring(0, 255) : title;
                         }
                         if (xlRange.Cells[i, 8] != null && xlRange.Cells[i, 8].Value2 != null)
                         {
                             description = xlRange.Cells[i, 8].Value2.ToString();
+                            description = Helpers.ReplaceReservedChars(description);
                         }
 
                         if (xlRange.Cells[i, 14] != null && xlRange.Cells[i, 14].Value2 != null)

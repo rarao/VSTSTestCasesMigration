@@ -179,8 +179,7 @@ namespace VSTSTestCasesMigration
             foreach (var step in steps)
             {
                 ITestStep newStep = testCase.CreateTestStep();
-                step.Item1.Replace(':', ' ');
-                newStep.Title = step.Item1.Replace(':', ' ');
+                newStep.Title = Helpers.ReplaceReservedChars(step.Item1);
                 newStep.ExpectedResult = step.Item2;
 
                 testCase.Actions.Add(newStep);
