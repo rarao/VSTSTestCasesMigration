@@ -10,7 +10,7 @@ namespace VSTSTestCasesMigration
     {
         public static string ReplaceReservedChars(string str)
         {
-            string[] strArr = new string[] { "<", ">", ":", "\"", "/", "\\", "|", "?", "*" };
+            string[] strArr = new string[] { "<", ">", ":", "\"", "/", "\\", "|", "?", "*","&" };
 
             for (int i = 0; i < strArr.Length; i++)
             {

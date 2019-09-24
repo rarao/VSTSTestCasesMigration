@@ -67,16 +67,40 @@ namespace VSTSTestCasesMigration
             tfs.Authenticate();
 
             var workItemStore = new WorkItemStore(tfs);
-            
+
             var project = (from Project pr in workItemStore.Projects
                            where pr.Name == name
                            select pr).FirstOrDefault();
             if (project == null)
                 throw new Exception($"Unable to find {name} in {uri}");
-            
+
             return project;
         }
-        public static void DeleteWorkItems(string uri,List<int> ids)
+        public static void DeleteWorkItemsOneByOne(string uri, List<int> ids)
+        {
+            try
+            {
+                TfsTeamProjectCollection tfs;
+
+                tfs = TfsTeamProjectCollectionFactory.GetTeamProjectCollection(new Uri(uri)); // https://mytfs.visualstudio.com/DefaultCollection
+                tfs.Authenticate();
+
+                var workItemStore = new WorkItemStore(tfs);
+
+                foreach(var id in ids)
+                {
+                    List<int> idList = new List<int>();
+                    idList.Add(id);
+                    workItemStore.DestroyWorkItems(idList);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while deleting workitems one by one " + ex.Message);
+            }
+        }
+        public static void DeleteWorkItems(string uri, List<int> ids)
         {
             try
             {
@@ -89,7 +113,7 @@ namespace VSTSTestCasesMigration
 
                 workItemStore.DestroyWorkItems(ids);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Error while deleting workitems " + ex.Message);
             }
@@ -187,7 +211,7 @@ namespace VSTSTestCasesMigration
             testCase.Save();
         }
 
-        public static void CreateAreaPath(string areaPath, string uri, Guid projectGUID,string PAT)
+        public static void CreateAreaPath(string areaPath, string uri, Guid projectGUID, string PAT)
         {
             try
             {
@@ -203,7 +227,7 @@ namespace VSTSTestCasesMigration
                 var result = client.CreateOrUpdateClassificationNodeAsync(node, projectGUID, Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.TreeStructureGroup.Areas, pathToParentNode).Result;
             }
             catch (AggregateException ex)
-            {               
+            {
             }
             catch (Exception ex)
             {
@@ -217,7 +241,7 @@ namespace VSTSTestCasesMigration
 
             // Create the work item. 
             WorkItem newTestCase = new WorkItem(workItemType);
-            newTestCase.Title = string.IsNullOrEmpty(title)?"Untitled":title;
+            newTestCase.Title = string.IsNullOrEmpty(title) ? "Untitled" : title;
             newTestCase.Description = string.IsNullOrEmpty(description) ? "no desc" : description;
             newTestCase.AreaPath = areaPath;
             newTestCase.IterationPath = iterationPath;

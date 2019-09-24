@@ -29,12 +29,13 @@ namespace VSTSTestCasesMigration
             MyLogger.FileName = AppDomain.CurrentDomain.BaseDirectory + baseDirectory.Substring(logFileStartIndex, baseDirectory.Length - logFileStartIndex - 1) + DateTime.Now.ToString("yyMMddHHmmss") + ".txt";
             //MyLogger.Log("abbcddd");
             //VSTSOperations.ManageTestPlans(uri, project, ConfigurationManager.AppSettings["TestPlanName"]);
-            //List<int> ids = new List<int>();
-            //for (int i = 18253; i <= 19352; i++)
-            //{
-            //    ids.Add(i);
-            //}
-            //VSTSOperations.DeleteWorkItems(uri, ids);
+            List<int> ids = new List<int>();
+            for (int i = 24201; i <= 24209; i++)
+            {
+                ids.Add(i);
+            }
+            VSTSOperations.DeleteWorkItemsOneByOne(uri, ids);
+            VSTSOperations.DeleteWorkItems(uri, ids);
 
             Excel.Application xlApp = new Excel.Application();
             Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(baseDirectory + tcFileName);
@@ -203,66 +204,82 @@ namespace VSTSTestCasesMigration
                         if (xlRange.Cells[i, 14] != null && xlRange.Cells[i, 14].Value2 != null)
                         {
                             Product = xlRange.Cells[i, 14].Value2.ToString();
+                            Product = Helpers.ReplaceReservedChars(Product);
                         }
                         if (xlRange.Cells[i, 15] != null && xlRange.Cells[i, 15].Value2 != null)
                         {
                             Component = xlRange.Cells[i, 15].Value2.ToString();
+                            Component = Helpers.ReplaceReservedChars(Component);
                         }
                         if (xlRange.Cells[i, 16] != null && xlRange.Cells[i, 16].Value2 != null)
                         {
                             SubComponent = xlRange.Cells[i, 16].Value2.ToString();
+                            SubComponent = Helpers.ReplaceReservedChars(SubComponent);
                         }
                         if (xlRange.Cells[i, 17] != null && xlRange.Cells[i, 17].Value2 != null)
                         {
                             Priority = xlRange.Cells[i, 17].Value2.ToString();
+                            Priority = Helpers.ReplaceReservedChars(Priority);
                         }
                         if (xlRange.Cells[i, 18] != null && xlRange.Cells[i, 18].Value2 != null)
                         {
                             Release = xlRange.Cells[i, 18].Value2.ToString();
+                            Release = Helpers.ReplaceReservedChars(Release);
                         }
                         if (xlRange.Cells[i, 19] != null && xlRange.Cells[i, 19].Value2 != null)
                         {
                             AutomationStatus = xlRange.Cells[i, 19].Value2.ToString();
+                            AutomationStatus = Helpers.ReplaceReservedChars(AutomationStatus);
                         }
                         if (xlRange.Cells[i, 20] != null && xlRange.Cells[i, 20].Value2 != null)
                         {
                             AutomationClassName = xlRange.Cells[i, 20].Value2.ToString();
+                            AutomationClassName = Helpers.ReplaceReservedChars(AutomationClassName);
                         }
                         if (xlRange.Cells[i, 21] != null && xlRange.Cells[i, 21].Value2 != null)
                         {
                             AutomationID = xlRange.Cells[i, 21].Value2.ToString();
+                            AutomationID = Helpers.ReplaceReservedChars(AutomationID);
                         }
                         if (xlRange.Cells[i, 22] != null && xlRange.Cells[i, 22].Value2 != null)
                         {
                             ReasonforNotAutomating = xlRange.Cells[i, 22].Value2.ToString();
+                            ReasonforNotAutomating = Helpers.ReplaceReservedChars(ReasonforNotAutomating);
                         }
                         if (xlRange.Cells[i, 23] != null && xlRange.Cells[i, 23].Value2 != null)
                         {
                             TestCategory = xlRange.Cells[i, 23].Value2.ToString();
+                            TestCategory = Helpers.ReplaceReservedChars(TestCategory);
                         }
                         if (xlRange.Cells[i, 24] != null && xlRange.Cells[i, 24].Value2 != null)
                         {
                             DeploymentMode = xlRange.Cells[i, 24].Value2.ToString();
+                            DeploymentMode = Helpers.ReplaceReservedChars(DeploymentMode);
                         }
                         if (xlRange.Cells[i, 25] != null && xlRange.Cells[i, 25].Value2 != null)
                         {
                             PAMTags = xlRange.Cells[i, 25].Value2.ToString();
+                            PAMTags = Helpers.ReplaceReservedChars(PAMTags);
                         }
                         if (xlRange.Cells[i, 26] != null && xlRange.Cells[i, 26].Value2 != null)
                         {
                             Test_Data = xlRange.Cells[i, 26].Value2.ToString();
+                            Test_Data = Helpers.ReplaceReservedChars(Test_Data);
                         }
                         if (xlRange.Cells[i, 27] != null && xlRange.Cells[i, 27].Value2 != null)
                         {
                             SolutionName = xlRange.Cells[i, 27].Value2.ToString();
+                            SolutionName = Helpers.ReplaceReservedChars(SolutionName);
                         }
                         if (xlRange.Cells[i, 28] != null && xlRange.Cells[i, 28].Value2 != null)
                         {
                             Applicable = xlRange.Cells[i, 28].Value2.ToString();
+                            Applicable = Helpers.ReplaceReservedChars(Applicable);
                         }
                         if (xlRange.Cells[i, 29] != null && xlRange.Cells[i, 29].Value2 != null)
                         {
                             EpicIds = xlRange.Cells[i, 29].Value2.ToString();
+                            EpicIds = Helpers.ReplaceReservedChars(EpicIds);
                         }
 
                         extraFields.Add(new Tuple<string, string>("Product", Product));
