@@ -71,6 +71,7 @@ namespace VSTSTestCasesMigration
                             suiteName = suiteName.Substring(suiteName.IndexOf(' ') + 1).Trim();
 
                             suiteName = Helpers.ReplaceReservedChars(suiteName);
+                            suiteName = Helpers.ReplaceExtraChars(suiteName);
 
                             while (depth <= areaPathStack.Count - 1)
                             {
@@ -117,6 +118,7 @@ namespace VSTSTestCasesMigration
                         suiteName = suiteName.Substring(suiteName.IndexOf(' ') + 1).Trim();
 
                         suiteName = Helpers.ReplaceReservedChars(suiteName);
+                        suiteName = Helpers.ReplaceExtraChars(suiteName);
 
                         while (depth <= areaPathStack.Count - 1)
                         {

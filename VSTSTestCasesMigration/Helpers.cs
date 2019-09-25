@@ -21,5 +21,18 @@ namespace VSTSTestCasesMigration
 
             return returnstr;
         }
+        public static string ReplaceExtraChars(string str)
+        {
+            string[] strArr = new string[] { "+","-","%","*","~","`","@","#","$","(",")" };
+
+            for (int i = 0; i < strArr.Length; i++)
+            {
+                str = str.Replace(strArr[i], "");
+            }
+
+            string returnstr = new string(str.Where(c => c < 128).ToArray());
+
+            return returnstr;
+        }
     }
 }
