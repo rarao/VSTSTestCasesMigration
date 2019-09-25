@@ -29,13 +29,13 @@ namespace VSTSTestCasesMigration
             MyLogger.FileName = AppDomain.CurrentDomain.BaseDirectory + baseDirectory.Substring(logFileStartIndex, baseDirectory.Length - logFileStartIndex - 1) + DateTime.Now.ToString("yyMMddHHmmss") + ".txt";
             //MyLogger.Log("abbcddd");
             //VSTSOperations.ManageTestPlans(uri, project, ConfigurationManager.AppSettings["TestPlanName"]);
-            List<int> ids = new List<int>();
-            for (int i = 24201; i <= 24209; i++)
-            {
-                ids.Add(i);
-            }
-            VSTSOperations.DeleteWorkItemsOneByOne(uri, ids);
-            VSTSOperations.DeleteWorkItems(uri, ids);
+            //List<int> ids = new List<int>();
+            //for (int i = 24201; i <= 24209; i++)
+            //{
+            //    ids.Add(i);
+            //}
+            //VSTSOperations.DeleteWorkItemsOneByOne(uri, ids);
+            //VSTSOperations.DeleteWorkItems(uri, ids);
 
             Excel.Application xlApp = new Excel.Application();
             Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(baseDirectory + tcFileName);
