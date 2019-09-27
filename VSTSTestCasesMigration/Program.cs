@@ -23,6 +23,7 @@ namespace VSTSTestCasesMigration
             string baseDirectory = ConfigurationManager.AppSettings["BaseDirectory"];
             string tcFileName = ConfigurationManager.AppSettings["TestCasesFile"];
             bool createAreaPaths = Convert.ToBoolean(ConfigurationManager.AppSettings["CreateAreaPaths"]);
+            string areaPathSuffix = ConfigurationManager.AppSettings["AreaPathSuffix"];
             var project = VSTSOperations.GetTeamProject(uri, projectName);
 
             int logFileStartIndex = baseDirectory.LastIndexOf('\\', baseDirectory.Length - 2) + 1;
@@ -30,7 +31,7 @@ namespace VSTSTestCasesMigration
             //MyLogger.Log("abbcddd");
             //VSTSOperations.ManageTestPlans(uri, project, ConfigurationManager.AppSettings["TestPlanName"]);
             //List<int> ids = new List<int>();
-            //for (int i = 24201; i <= 24209; i++)
+            //for (int i = 43925; i <= 44325; i++)
             //{
             //    ids.Add(i);
             //}
@@ -46,7 +47,7 @@ namespace VSTSTestCasesMigration
             int colCount = xlRange.Columns.Count;
 
             Stack<string> areaPathStack = new Stack<string>();
-            areaPathStack.Push(projectName + "\\" + productName);
+            areaPathStack.Push(projectName + "\\" + productName + areaPathSuffix);
 
             if (createAreaPaths)
             {
@@ -95,7 +96,7 @@ namespace VSTSTestCasesMigration
             while (areaPathStack.Count != 0)
                 areaPathStack.Pop();
 
-            areaPathStack.Push(projectName + "\\" + productName);
+            areaPathStack.Push(projectName + "\\" + productName + areaPathSuffix);
 
             for (int i = 2; i <= rowCount; i++)
             {
@@ -152,6 +153,9 @@ namespace VSTSTestCasesMigration
                     string Applicable = string.Empty;
                     string EpicIds = string.Empty;
 
+                    string NonWfmMode = string.Empty;
+                    string SsoMode = string.Empty;
+
                     List<Tuple<string, string>> extraFields = new List<Tuple<string, string>>();
                     List<string> attachments = new List<string>();
 
@@ -202,12 +206,6 @@ namespace VSTSTestCasesMigration
                             description = xlRange.Cells[i, 8].Value2.ToString();
                             description = Helpers.ReplaceReservedChars(description);
                         }
-
-                        if (xlRange.Cells[i, 14] != null && xlRange.Cells[i, 14].Value2 != null)
-                        {
-                            Product = xlRange.Cells[i, 14].Value2.ToString();
-                            Product = Helpers.ReplaceReservedChars(Product);
-                        }
                         if (xlRange.Cells[i, 15] != null && xlRange.Cells[i, 15].Value2 != null)
                         {
                             Component = xlRange.Cells[i, 15].Value2.ToString();
@@ -218,73 +216,160 @@ namespace VSTSTestCasesMigration
                             SubComponent = xlRange.Cells[i, 16].Value2.ToString();
                             SubComponent = Helpers.ReplaceReservedChars(SubComponent);
                         }
-                        if (xlRange.Cells[i, 17] != null && xlRange.Cells[i, 17].Value2 != null)
+                        if (productName.Equals("foundation", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            Priority = xlRange.Cells[i, 17].Value2.ToString();
-                            Priority = Helpers.ReplaceReservedChars(Priority);
+                            if (xlRange.Cells[i, 14] != null && xlRange.Cells[i, 14].Value2 != null)
+                            {
+                                Product = xlRange.Cells[i, 14].Value2.ToString();
+                                Product = Helpers.ReplaceReservedChars(Product);
+                            }
+                            if (xlRange.Cells[i, 17] != null && xlRange.Cells[i, 17].Value2 != null)
+                            {
+                                Priority = xlRange.Cells[i, 17].Value2.ToString();
+                                Priority = Helpers.ReplaceReservedChars(Priority);
+                            }
+                            if (xlRange.Cells[i, 18] != null && xlRange.Cells[i, 18].Value2 != null)
+                            {
+                                Release = xlRange.Cells[i, 18].Value2.ToString();
+                                Release = Helpers.ReplaceReservedChars(Release);
+                            }
+                            if (xlRange.Cells[i, 19] != null && xlRange.Cells[i, 19].Value2 != null)
+                            {
+                                AutomationStatus = xlRange.Cells[i, 19].Value2.ToString();
+                                AutomationStatus = Helpers.ReplaceReservedChars(AutomationStatus);
+                            }
+                            if (xlRange.Cells[i, 20] != null && xlRange.Cells[i, 20].Value2 != null)
+                            {
+                                AutomationClassName = xlRange.Cells[i, 20].Value2.ToString();
+                                AutomationClassName = Helpers.ReplaceReservedChars(AutomationClassName);
+                            }
+                            if (xlRange.Cells[i, 21] != null && xlRange.Cells[i, 21].Value2 != null)
+                            {
+                                AutomationID = xlRange.Cells[i, 21].Value2.ToString();
+                                AutomationID = Helpers.ReplaceReservedChars(AutomationID);
+                            }
+                            if (xlRange.Cells[i, 22] != null && xlRange.Cells[i, 22].Value2 != null)
+                            {
+                                ReasonforNotAutomating = xlRange.Cells[i, 22].Value2.ToString();
+                                ReasonforNotAutomating = Helpers.ReplaceReservedChars(ReasonforNotAutomating);
+                            }
+                            if (xlRange.Cells[i, 23] != null && xlRange.Cells[i, 23].Value2 != null)
+                            {
+                                TestCategory = xlRange.Cells[i, 23].Value2.ToString();
+                                TestCategory = Helpers.ReplaceReservedChars(TestCategory);
+                            }
+                            if (xlRange.Cells[i, 24] != null && xlRange.Cells[i, 24].Value2 != null)
+                            {
+                                DeploymentMode = xlRange.Cells[i, 24].Value2.ToString();
+                                DeploymentMode = Helpers.ReplaceReservedChars(DeploymentMode);
+                            }
+                            if (xlRange.Cells[i, 25] != null && xlRange.Cells[i, 25].Value2 != null)
+                            {
+                                PAMTags = xlRange.Cells[i, 25].Value2.ToString();
+                                PAMTags = Helpers.ReplaceReservedChars(PAMTags);
+                            }
+                            if (xlRange.Cells[i, 26] != null && xlRange.Cells[i, 26].Value2 != null)
+                            {
+                                Test_Data = xlRange.Cells[i, 26].Value2.ToString();
+                                Test_Data = Helpers.ReplaceReservedChars(Test_Data);
+                            }
+                            if (xlRange.Cells[i, 27] != null && xlRange.Cells[i, 27].Value2 != null)
+                            {
+                                SolutionName = xlRange.Cells[i, 27].Value2.ToString();
+                                SolutionName = Helpers.ReplaceReservedChars(SolutionName);
+                            }
+                            if (xlRange.Cells[i, 28] != null && xlRange.Cells[i, 28].Value2 != null)
+                            {
+                                Applicable = xlRange.Cells[i, 28].Value2.ToString();
+                                Applicable = Helpers.ReplaceReservedChars(Applicable);
+                            }
+                            if (xlRange.Cells[i, 29] != null && xlRange.Cells[i, 29].Value2 != null)
+                            {
+                                EpicIds = xlRange.Cells[i, 29].Value2.ToString();
+                                EpicIds = Helpers.ReplaceReservedChars(EpicIds);
+                            }
                         }
-                        if (xlRange.Cells[i, 18] != null && xlRange.Cells[i, 18].Value2 != null)
+                        else if (productName.Equals("studio", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            Release = xlRange.Cells[i, 18].Value2.ToString();
-                            Release = Helpers.ReplaceReservedChars(Release);
-                        }
-                        if (xlRange.Cells[i, 19] != null && xlRange.Cells[i, 19].Value2 != null)
-                        {
-                            AutomationStatus = xlRange.Cells[i, 19].Value2.ToString();
-                            AutomationStatus = Helpers.ReplaceReservedChars(AutomationStatus);
-                        }
-                        if (xlRange.Cells[i, 20] != null && xlRange.Cells[i, 20].Value2 != null)
-                        {
-                            AutomationClassName = xlRange.Cells[i, 20].Value2.ToString();
-                            AutomationClassName = Helpers.ReplaceReservedChars(AutomationClassName);
-                        }
-                        if (xlRange.Cells[i, 21] != null && xlRange.Cells[i, 21].Value2 != null)
-                        {
-                            AutomationID = xlRange.Cells[i, 21].Value2.ToString();
-                            AutomationID = Helpers.ReplaceReservedChars(AutomationID);
-                        }
-                        if (xlRange.Cells[i, 22] != null && xlRange.Cells[i, 22].Value2 != null)
-                        {
-                            ReasonforNotAutomating = xlRange.Cells[i, 22].Value2.ToString();
-                            ReasonforNotAutomating = Helpers.ReplaceReservedChars(ReasonforNotAutomating);
-                        }
-                        if (xlRange.Cells[i, 23] != null && xlRange.Cells[i, 23].Value2 != null)
-                        {
-                            TestCategory = xlRange.Cells[i, 23].Value2.ToString();
-                            TestCategory = Helpers.ReplaceReservedChars(TestCategory);
-                        }
-                        if (xlRange.Cells[i, 24] != null && xlRange.Cells[i, 24].Value2 != null)
-                        {
-                            DeploymentMode = xlRange.Cells[i, 24].Value2.ToString();
-                            DeploymentMode = Helpers.ReplaceReservedChars(DeploymentMode);
-                        }
-                        if (xlRange.Cells[i, 25] != null && xlRange.Cells[i, 25].Value2 != null)
-                        {
-                            PAMTags = xlRange.Cells[i, 25].Value2.ToString();
-                            PAMTags = Helpers.ReplaceReservedChars(PAMTags);
-                        }
-                        if (xlRange.Cells[i, 26] != null && xlRange.Cells[i, 26].Value2 != null)
-                        {
-                            Test_Data = xlRange.Cells[i, 26].Value2.ToString();
-                            Test_Data = Helpers.ReplaceReservedChars(Test_Data);
-                        }
-                        if (xlRange.Cells[i, 27] != null && xlRange.Cells[i, 27].Value2 != null)
-                        {
-                            SolutionName = xlRange.Cells[i, 27].Value2.ToString();
-                            SolutionName = Helpers.ReplaceReservedChars(SolutionName);
-                        }
-                        if (xlRange.Cells[i, 28] != null && xlRange.Cells[i, 28].Value2 != null)
-                        {
-                            Applicable = xlRange.Cells[i, 28].Value2.ToString();
-                            Applicable = Helpers.ReplaceReservedChars(Applicable);
-                        }
-                        if (xlRange.Cells[i, 29] != null && xlRange.Cells[i, 29].Value2 != null)
-                        {
-                            EpicIds = xlRange.Cells[i, 29].Value2.ToString();
-                            EpicIds = Helpers.ReplaceReservedChars(EpicIds);
+                            if (xlRange.Cells[i, 14] != null && xlRange.Cells[i, 14].Value2 != null)
+                            {
+                                Priority = xlRange.Cells[i, 14].Value2.ToString();
+                                Priority = Helpers.ReplaceReservedChars(Priority);
+                            }
+                            if (xlRange.Cells[i, 17] != null && xlRange.Cells[i, 17].Value2 != null)
+                            {
+                                Release = xlRange.Cells[i, 17].Value2.ToString();
+                                Release = Helpers.ReplaceReservedChars(Release);
+                            }
+                            if (xlRange.Cells[i, 18] != null && xlRange.Cells[i, 18].Value2 != null)
+                            {
+                                DeploymentMode = xlRange.Cells[i, 18].Value2.ToString();
+                                DeploymentMode = Helpers.ReplaceReservedChars(DeploymentMode);
+                            }
+                            if (xlRange.Cells[i, 19] != null && xlRange.Cells[i, 19].Value2 != null)
+                            {
+                                PAMTags = xlRange.Cells[i, 19].Value2.ToString();
+                                PAMTags = Helpers.ReplaceReservedChars(PAMTags);
+                            }
+                            if (xlRange.Cells[i, 20] != null && xlRange.Cells[i, 20].Value2 != null)
+                            {
+                                TestCategory = xlRange.Cells[i, 20].Value2.ToString();
+                                TestCategory = Helpers.ReplaceReservedChars(TestCategory);
+                            }
+                            if (xlRange.Cells[i, 21] != null && xlRange.Cells[i, 21].Value2 != null)
+                            {
+                                AutomationStatus = xlRange.Cells[i, 21].Value2.ToString();
+                                AutomationStatus = Helpers.ReplaceReservedChars(AutomationStatus);
+                            }
+                            if (xlRange.Cells[i, 22] != null && xlRange.Cells[i, 22].Value2 != null)
+                            {
+                                AutomationClassName = xlRange.Cells[i, 22].Value2.ToString();
+                                AutomationClassName = Helpers.ReplaceReservedChars(AutomationClassName);
+                            }
+                            if (xlRange.Cells[i, 23] != null && xlRange.Cells[i, 23].Value2 != null)
+                            {
+                                AutomationID = xlRange.Cells[i, 23].Value2.ToString();
+                                AutomationID = Helpers.ReplaceReservedChars(AutomationID);
+                            }
+                            if (xlRange.Cells[i, 24] != null && xlRange.Cells[i, 24].Value2 != null)
+                            {
+                                Test_Data = xlRange.Cells[i, 24].Value2.ToString();
+                                Test_Data = Helpers.ReplaceReservedChars(Test_Data);
+                            }
+                            if (xlRange.Cells[i, 25] != null && xlRange.Cells[i, 25].Value2 != null)
+                            {
+                                ReasonforNotAutomating = xlRange.Cells[i, 25].Value2.ToString();
+                                ReasonforNotAutomating = Helpers.ReplaceReservedChars(ReasonforNotAutomating);
+                            }
+                            if (xlRange.Cells[i, 26] != null && xlRange.Cells[i, 26].Value2 != null)
+                            {
+                                EpicIds = xlRange.Cells[i, 26].Value2.ToString();
+                                EpicIds = Helpers.ReplaceReservedChars(EpicIds);
+                            }
+                            if (xlRange.Cells[i, 27] != null && xlRange.Cells[i, 27].Value2 != null)
+                            {
+                                NonWfmMode = xlRange.Cells[i, 27].Value2.ToString();
+                                NonWfmMode = Helpers.ReplaceReservedChars(NonWfmMode);
+                            }
+                            if (xlRange.Cells[i, 28] != null && xlRange.Cells[i, 28].Value2 != null)
+                            {
+                                SsoMode = xlRange.Cells[i, 28].Value2.ToString();
+                                SsoMode = Helpers.ReplaceReservedChars(SsoMode);
+                            }
                         }
 
-                        extraFields.Add(new Tuple<string, string>("Product", Product));
+                        if (productName.Equals("foundation", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            extraFields.Add(new Tuple<string, string>("Product", Product));
+                            extraFields.Add(new Tuple<string, string>("Solution Name", SolutionName));
+                            extraFields.Add(new Tuple<string, string>("Applicable", Applicable));
+                        }
+                        else if (productName.Equals("studio", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            extraFields.Add(new Tuple<string, string>("NON WFM Mode", NonWfmMode));
+                            extraFields.Add(new Tuple<string, string>("SSO Mode", SsoMode));
+                        }
+
                         extraFields.Add(new Tuple<string, string>("Component", Component));
                         extraFields.Add(new Tuple<string, string>("Sub Component", SubComponent));
                         extraFields.Add(new Tuple<string, string>("qtestPriority", Priority));
@@ -297,8 +382,6 @@ namespace VSTSTestCasesMigration
                         extraFields.Add(new Tuple<string, string>("Deployment Mode", DeploymentMode));
                         extraFields.Add(new Tuple<string, string>("PAM Tags", PAMTags));
                         extraFields.Add(new Tuple<string, string>("Test_Data", Test_Data));
-                        extraFields.Add(new Tuple<string, string>("Solution Name", SolutionName));
-                        extraFields.Add(new Tuple<string, string>("Applicable", Applicable));
                         extraFields.Add(new Tuple<string, string>("EPIC_IDs", EpicIds));
 
                         if (xlRange.Cells[i, 5] != null && xlRange.Cells[i, 5].Value2 != null)
