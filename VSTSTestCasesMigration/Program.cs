@@ -366,6 +366,29 @@ namespace VSTSTestCasesMigration
                                     SsoMode = Helpers.ReplaceReservedChars(SsoMode);
                                 }
                             }
+                            else
+                            {
+                                if (xlRange.Cells[i, 14] != null && xlRange.Cells[i, 14].Value2 != null)
+                                {
+                                    Priority = xlRange.Cells[i, 14].Value2.ToString();
+                                    Priority = Helpers.ReplaceReservedChars(Priority);
+                                }
+                                if (xlRange.Cells[i, 17] != null && xlRange.Cells[i, 17].Value2 != null)
+                                {
+                                    Release = xlRange.Cells[i, 17].Value2.ToString();
+                                    Release = Helpers.ReplaceReservedChars(Release);
+                                }
+                                if (xlRange.Cells[i, 18] != null && xlRange.Cells[i, 18].Value2 != null)
+                                {
+                                    AutomationStatus = xlRange.Cells[i, 18].Value2.ToString();
+                                    AutomationStatus = Helpers.ReplaceReservedChars(AutomationStatus);
+                                }
+                                if (xlRange.Cells[i, 21] != null && xlRange.Cells[i, 21].Value2 != null)
+                                {
+                                    TestCategory = xlRange.Cells[i, 21].Value2.ToString();
+                                    TestCategory = Helpers.ReplaceReservedChars(TestCategory);
+                                }
+                            }
 
                             if (productName.Equals("foundation", StringComparison.InvariantCultureIgnoreCase))
                             {
