@@ -87,13 +87,13 @@ namespace VSTSTestCasesMigration
 
                 var workItemStore = new WorkItemStore(tfs);
 
-                foreach(var id in ids)
+                foreach (var id in ids)
                 {
                     List<int> idList = new List<int>();
                     idList.Add(id);
                     workItemStore.DestroyWorkItems(idList);
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -167,17 +167,27 @@ namespace VSTSTestCasesMigration
 
             foreach (Node childNode in childNodes)
             {
-                IStaticTestSuite newsuite = testProject.TestSuites.CreateStatic();
+                IStaticTestSuite newsuite = null;
+                newsuite = (IStaticTestSuite)testProject.TestSuites.Find(68227);
+
+                newsuite = testProject.TestSuites.CreateStatic();
                 newsuite.Title = childNode.Name;
                 parentSuite.Entries.Add(newsuite);
                 newTestPlan.Save();
 
-                //find tc's based on areapath
-                IEnumerable<ITestCase> tcs = testProject.TestCases.Query(string.Format("SELECT [System.Id], [System.Title] FROM WorkItems WHERE [System.TeamProject]='{0}' AND [System.AreaPath]='{1}' AND [System.WorkItemType]='Test Case'", testProject.TeamProjectName, parentAreaPath + "\\" + childNode.Name));
-                //Add the above entries to the static test suite.
-                foreach (ITestCase tc in tcs)
+                try
                 {
-                    newsuite.Entries.Add(tc);
+                    //find tc's based on areapath
+                    IEnumerable<ITestCase> tcs = testProject.TestCases.Query(string.Format("SELECT [System.Id], [System.Title] FROM WorkItems WHERE [System.TeamProject]='{0}' AND [System.AreaPath]='{1}' AND [System.WorkItemType]='Test Case'", testProject.TeamProjectName, parentAreaPath + "\\" + childNode.Name));
+                    //Add the above entries to the static test suite.
+                    foreach (ITestCase tc in tcs)
+                    {
+                        newsuite.Entries.Add(tc);
+                    }
+                }
+                catch
+                {
+                    MyLogger.Log("Error while adding tcs for node : " + childNode.Name + " whose parent area path is : " + parentAreaPath);
                 }
 
                 newTestPlan.Save();
